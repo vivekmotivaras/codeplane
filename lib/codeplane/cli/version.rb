@@ -9,6 +9,10 @@ module Codeplane
         TEXT
       end
 
+      def skip_credentials?
+        true
+      end
+
       def base
         say_and_exit "Codeplane #{Codeplane::Version::STRING}"
       end

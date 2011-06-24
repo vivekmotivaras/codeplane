@@ -18,8 +18,12 @@ module Codeplane
         say_and_exit("Not doing anything".green)
       end
 
+      def skip_credentials?
+        false
+      end
+
       def run(command)
-        raise Codeplane::UnauthorizedError unless kind_of?(Codeplane::CLI::Setup) || Codeplane::CLI.credentials?
+        raise Codeplane::UnauthorizedError unless skip_credentials? || Codeplane::CLI.credentials?
         self.class.help & exit(1) unless respond_to?(command)
         send(command)
       end

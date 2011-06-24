@@ -11,6 +11,8 @@ describe Codeplane::CLI::Setup do
     subject.stub :gets => ""
   end
 
+  its(:skip_credentials?) { should be_true }
+
   it "sets credentials" do
     subject.should_receive(:gets).and_return("the_real_john\n", "some_api_key\n")
     subject.base

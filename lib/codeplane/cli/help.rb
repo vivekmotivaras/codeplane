@@ -30,6 +30,10 @@ module Codeplane
 
         TEXT
       end
+      
+      def skip_credentials?
+        true
+      end
 
       def base
         commands_for_args.each do |command|

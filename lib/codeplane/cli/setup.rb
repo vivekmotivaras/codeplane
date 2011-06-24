@@ -9,6 +9,10 @@ module Codeplane
         TEXT
       end
 
+      def skip_credentials?
+        true
+      end
+
       def base
         Codeplane::CLI.stdout << "Your username: "
         Codeplane.username = gets.chomp

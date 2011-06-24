@@ -5,6 +5,8 @@ describe Codeplane::CLI::Help do
     Codeplane::CLI.stdout = StringIO.new
     Codeplane::CLI.stderr = StringIO.new
   end
+  
+  its(:skip_credentials?) { should be_true }
 
   it "displays help for all known commands" do
     Codeplane::CLI::Help.should_receive(:help).ordered.once

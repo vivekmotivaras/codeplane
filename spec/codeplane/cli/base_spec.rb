@@ -24,8 +24,9 @@ describe Codeplane::CLI::Base do
       }.to_not raise_error
     end
 
-    it "executes command when running setup" do
-      Codeplane::CLI.stub :credentials? => true
+    it "executes command when skip_credentials is set" do
+      Codeplane::CLI.stub :credentials? => false
+      Codeplane::CLI.stub :skip_credentials? => true
       Codeplane::CLI::Setup.any_instance.should_receive(:base)
 
       expect {
