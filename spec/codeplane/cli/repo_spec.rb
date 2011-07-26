@@ -118,7 +118,7 @@ describe Codeplane::CLI::Repo do
 
       Codeplane::CLI.stdout.should include("Name: repo-1")
       Codeplane::CLI.stdout.should include("Git url: repo-1.git")
-      Codeplane::CLI.stdout.should include("Usage: 0 bytes")
+      Codeplane::CLI.stdout.should include("Usage: 0.00 bytes")
       Codeplane::CLI.stdout.should include("Owner: You")
     end
 

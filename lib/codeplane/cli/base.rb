@@ -43,12 +43,14 @@ module Codeplane
       end
 
       def human_size(size)
+        size = size.to_f
+
         if size < KILOBYTE
-          sprintf("%d %s", size, "bytes")
+          sprintf("%.2f %s", size, "bytes")
         elsif size < MEGABYTE
-          sprintf("%d%s", size / KB, "KB")
+          sprintf("%.2f %s", size / KILOBYTE, "KB")
         else
-          sprintf("%d%s", size / MB, "MB")
+          sprintf("%.2f %s", size / MEGABYTE, "MB")
         end
       end
     end
