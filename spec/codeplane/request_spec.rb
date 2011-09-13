@@ -60,7 +60,7 @@ describe Codeplane::Request do
 
     it "sets body" do
       subject.post("/", :repository => {:name => "myrepo"})
-      FakeWeb.last_request.body.should == "repository[name]=myrepo"
+      request_body.should == {"repository" => {"name" => "myrepo"}}
     end
 
     it "sets credentials" do
