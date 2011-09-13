@@ -6,7 +6,7 @@ module Codeplane
 
       def collaborators
         @collaborators ||= Codeplane::Collection.new(
-          :resource_path       => "/repositories/#{id}/collaborators",
+          :resource_path       => "/repositories/#{name}/collaborators",
           :resource_class_name => "User",
           :extension           => Codeplane::Resource::Extensions::Collaborator,
           :parent              => self

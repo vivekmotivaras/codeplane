@@ -26,12 +26,12 @@ describe Codeplane::Resource::Repository, "#collaborators" do
   describe "#remove" do
     context "with existing collaborator" do
       before do
-        FakeWeb.register_uri :get, "https://john:abc@codeplane.com/api/v1/repositories/1234/collaborators", :body => [{:id => 5678, :email => "john@doe.com"}].to_json
-        FakeWeb.register_uri :delete, "https://john:abc@codeplane.com/api/v1/repositories/1234/collaborators/5678", :status => 200
+        FakeWeb.register_uri :get, "https://john:abc@codeplane.com/api/v1/repositories/some-project/collaborators", :body => [{:id => 5678, :email => "john@doe.com"}].to_json
+        FakeWeb.register_uri :delete, "https://john:abc@codeplane.com/api/v1/repositories/some-project/collaborators/5678", :status => 200
       end
 
       subject {
-        Codeplane::Resource::Repository.new(:id => 1234).collaborators.remove("john@doe.com")
+        Codeplane::Resource::Repository.new(:name => "some-project").collaborators.remove("john@doe.com")
       }
 
       it "makes a DELETE request" do
@@ -46,12 +46,12 @@ describe Codeplane::Resource::Repository, "#collaborators" do
 
     context "with missing collaborator" do
       before do
-        FakeWeb.register_uri :get, "https://john:abc@codeplane.com/api/v1/repositories/1234/collaborators", :body => [{:id => 5678, :email => "john@doe.com"}].to_json
-        FakeWeb.register_uri :delete, "https://john:abc@codeplane.com/api/v1/repositories/1234/collaborators/5678", :status => 404
+        FakeWeb.register_uri :get, "https://john:abc@codeplane.com/api/v1/repositories/some-project/collaborators", :body => [{:id => 5678, :email => "john@doe.com"}].to_json
+        FakeWeb.register_uri :delete, "https://john:abc@codeplane.com/api/v1/repositories/some-project/collaborators/5678", :status => 404
       end
 
       subject {
-        Codeplane::Resource::Repository.new(:id => 1234).collaborators.remove("mary@doe.com")
+        Codeplane::Resource::Repository.new(:name => "some-project").collaborators.remove("mary@doe.com")
       }
 
       it "raises exception" do
@@ -63,11 +63,11 @@ describe Codeplane::Resource::Repository, "#collaborators" do
   describe "#invite" do
     context "with valid data" do
       before do
-        FakeWeb.register_uri :post, "https://john:abc@codeplane.com/api/v1/repositories/1234/collaborators", :body => {:email => "john@doe.com", :errors => []}.to_json, :status => 201
+        FakeWeb.register_uri :post, "https://john:abc@codeplane.com/api/v1/repositories/some-project/collaborators", :body => {:email => "john@doe.com", :errors => []}.to_json, :status => 201
       end
 
       subject {
-        Codeplane::Resource::Repository.new(:id => 1234).collaborators.invite("john@doe.com")
+        Codeplane::Resource::Repository.new(:name => "some-project").collaborators.invite("john@doe.com")
       }
 
       its(:email) { should == "john@doe.com" }
@@ -87,11 +87,11 @@ describe Codeplane::Resource::Repository, "#collaborators" do
 
     context "with invalid data" do
       before do
-        FakeWeb.register_uri :post, "https://john:abc@codeplane.com/api/v1/repositories/1234/collaborators", :body => {:email => "john", :errors => ["Email is invalid"]}.to_json, :status => 201
+        FakeWeb.register_uri :post, "https://john:abc@codeplane.com/api/v1/repositories/some-project/collaborators", :body => {:email => "john", :errors => ["Email is invalid"]}.to_json, :status => 201
       end
 
       subject {
-        Codeplane::Resource::Repository.new(:id => 1234).collaborators.invite("john@doe.com")
+        Codeplane::Resource::Repository.new(:name => "some-project").collaborators.invite("john@doe.com")
       }
 
       it { subject.should_not be_valid }

@@ -1,11 +1,11 @@
 require "spec_helper"
 
 describe Codeplane::Resource::Repository do
-  subject { Codeplane::Resource::Repository.new(:id => 1234, :name => "macbook") }
+  subject { Codeplane::Resource::Repository.new(:id => 1234, :name => "some-project") }
 
   describe "#collaborators" do
     let(:collection) { :collaborators }
-    let(:resource_path) { "/repositories/1234/collaborators" }
+    let(:resource_path) { "/repositories/some-project/collaborators" }
     let(:resource_class_name) { "User" }
     let(:resource_class) { Codeplane::Resource::User }
 
@@ -60,7 +60,7 @@ describe Codeplane::Resource::Repository do
     }
 
     its(:attributes) {
-      should == {:repository => {:name => "macbook"}}
+      should == {:repository => {:name => "some-project"}}
     }
   end
 end
