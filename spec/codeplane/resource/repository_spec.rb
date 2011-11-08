@@ -1,7 +1,13 @@
 require "spec_helper"
 
 describe Codeplane::Resource::Repository do
-  subject { Codeplane::Resource::Repository.new(:id => 1234, :name => "some-project") }
+  subject {
+    Codeplane::Resource::Repository.new(
+      :id => 1234,
+      :name => "some-project",
+      :collection_resource_path => "/repositories"
+    )
+  }
 
   describe "#collaborators" do
     let(:collection) { :collaborators }
@@ -10,6 +16,10 @@ describe Codeplane::Resource::Repository do
     let(:resource_class) { Codeplane::Resource::User }
 
     it_behaves_like "resource collection"
+  end
+
+  describe "#resource_path" do
+    its(:resource_path) { should == "/repositories/some-project" }
   end
 
   describe "#mine?" do
@@ -37,9 +47,9 @@ describe Codeplane::Resource::Repository do
     end
 
     it "removes my repository" do
-      FakeWeb.register_uri :delete, "https://john:abc@codeplane.com/api/v1/repositories/1234", :status => 200
+      FakeWeb.register_uri :delete, "https://john:abc@codeplane.com/api/v1/repositories/some-repo", :status => 200
       default_credentials!
-      subject = Codeplane::Resource::Repository.new(:id => 1234, :user => {:username => "john"}, :collection_resource_path => "/repositories")
+      subject = Codeplane::Resource::Repository.new(:id => 1234, :name => "some-repo", :user => {:username => "john"}, :collection_resource_path => "/repositories")
       subject.destroy
     end
   end
@@ -62,5 +72,8 @@ describe Codeplane::Resource::Repository do
     its(:attributes) {
       should == {:repository => {:name => "some-project"}}
     }
+
+    its(:collection_resource_path) { should == "/repositories" }
+    its(:to_param) { should == "some-project" }
   end
 end

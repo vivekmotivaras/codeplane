@@ -16,6 +16,8 @@ describe Codeplane::Resource::PublicKey do
       }.to_not raise_error
     }
 
+    its(:to_param) { should == 1234 }
+
     its(:attributes) {
       should == {:public_key => {
         :name => "macbook's",

@@ -29,6 +29,12 @@ module Codeplane
         id.nil?
       end
 
+      # Return identifier for URL.
+      #
+      def to_param
+        id
+      end
+
       # Do a API call to create or update this resource. It do a POST request if
       # it's a Codeplane::Resource::Base#new_record? or a PUT request otherwise.
       #
@@ -62,7 +68,7 @@ module Codeplane
       #
       def resource_path
         parts = [collection_resource_path]
-        parts << id.to_s unless new_record?
+        parts << to_param.to_s unless new_record?
         File.join(*parts)
       end
 

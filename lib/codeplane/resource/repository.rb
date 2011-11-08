@@ -19,6 +19,12 @@ module Codeplane
         user && user.username == Codeplane.username
       end
 
+      # Override default +to_param+.
+      #
+      def to_param
+        name
+      end
+
       # Override +destroy+ method and warn user when trying to remove
       # a repository that his just collaborating.
       #
