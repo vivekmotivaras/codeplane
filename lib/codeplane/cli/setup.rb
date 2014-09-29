@@ -18,6 +18,8 @@ module Codeplane
         Codeplane.username = gets.chomp
 
         Codeplane::CLI.stdout << "Your API key: "
+
+        system "stty -echo" if $stdin.isatty rescue nil
         Codeplane.api_key = gets.chomp
 
         Codeplane::Request.get("/auth")
