@@ -5,41 +5,41 @@ describe Codeplane::CLI do
   let(:stderr) { StringIO.new }
 
   it "sets config file path" do
-    Codeplane::CLI.config_file.should == File.expand_path("~/.codeplane")
+    expect(Codeplane::CLI.config_file).to eq(File.expand_path("~/.codeplane"))
   end
 
   context "exception handling" do
     it "wraps Codeplane::UnauthorizedError" do
-      Codeplane::CLI.should_receive(:command_class_for).and_raise(Codeplane::UnauthorizedError)
-      Codeplane::CLI.should_receive(:exit).with(1).and_raise(SystemExit)
+      expect(Codeplane::CLI).to receive(:command_class_for).and_raise(Codeplane::UnauthorizedError)
+      expect(Codeplane::CLI).to receive(:exit).with(1).and_raise(SystemExit)
 
       expect {
         Codeplane::CLI.start(%w[setup], "", "")
       }.to raise_error(SystemExit)
 
-      Codeplane::CLI.stderr.should include("We couldn't authenticate you. Double check your credentials.")
+      expect(Codeplane::CLI.stderr).to include("We couldn't authenticate you. Double check your credentials.")
     end
 
     it "wraps uncaught exceptions" do
-      Codeplane::CLI.should_receive(:command_class_for).and_raise(Exception)
-      Codeplane::CLI.should_receive(:exit).with(1).and_raise(SystemExit)
+      expect(Codeplane::CLI).to receive(:command_class_for).and_raise(Exception)
+      expect(Codeplane::CLI).to receive(:exit).with(1).and_raise(SystemExit)
 
       expect {
         Codeplane::CLI.start([], "", "")
       }.to raise_error(SystemExit)
 
-      Codeplane::CLI.stderr.should include("Something went wrong.")
+      expect(Codeplane::CLI.stderr).to include("Something went wrong.")
     end
   end
 
   context "invalid commands" do
     it "displays help for empty args" do
-      Codeplane::CLI::Help.should_receive(:help).once
+      expect(Codeplane::CLI::Help).to receive(:help).once
       Codeplane::CLI.start([], stdout, stderr)
     end
 
     it "displays help" do
-      Codeplane::CLI::Help.should_receive(:help).once
+      expect(Codeplane::CLI::Help).to receive(:help).once
 
       expect {
         Codeplane::CLI.start(%w[invalid:command], stdout, stderr)
@@ -47,7 +47,7 @@ describe Codeplane::CLI do
     end
 
     it "exits" do
-      Codeplane::CLI::Help.any_instance.should_receive(:exit).with(1).and_raise(SystemExit)
+      expect_any_instance_of(Codeplane::CLI::Help).to receive(:exit).with(1).and_raise(SystemExit)
 
       expect {
         Codeplane::CLI.start(%w[invalid:command], stdout, stderr)
@@ -57,19 +57,19 @@ describe Codeplane::CLI do
 
   context "subcommand" do
     it "executes original argument" do
-      Codeplane::CLI::Setup.any_instance.should_receive(:perform).once
+      expect_any_instance_of(Codeplane::CLI::Setup).to receive(:perform).once
       Codeplane::CLI.start(%w[setup:perform], stdout, stderr)
     end
 
     it "defaults to base when available" do
-      Codeplane::CLI::Setup.any_instance.should_receive(:respond_to?).and_return(true)
-      Codeplane::CLI::Setup.any_instance.should_receive(:base).once
+      expect_any_instance_of(Codeplane::CLI::Setup).to receive(:respond_to?).and_return(true)
+      expect_any_instance_of(Codeplane::CLI::Setup).to receive(:base).once
       Codeplane::CLI.start(%w[setup], stdout, stderr)
     end
 
     it "executes help command when don't respond to base" do
-      Codeplane::CLI::Setup.any_instance.should_receive(:respond_to?).and_return(false)
-      Codeplane::CLI::Setup.should_receive(:help).once
+      expect_any_instance_of(Codeplane::CLI::Setup).to receive(:respond_to?).and_return(false)
+      expect(Codeplane::CLI::Setup).to receive(:help).once
 
       expect {
         Codeplane::CLI.start(%w[setup], stdout, stderr)

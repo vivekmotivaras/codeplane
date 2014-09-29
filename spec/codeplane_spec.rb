@@ -4,24 +4,24 @@ describe Codeplane do
   describe ".configure" do
     it "sets username" do
       Codeplane.configure {|c| c.username = "johndoe"}
-      Codeplane.username.should == "johndoe"
+      expect(Codeplane.username).to eq("johndoe")
     end
 
     it "sets API key" do
       Codeplane.configure {|c| c.api_key = "abc"}
-      Codeplane.api_key.should == "abc"
+      expect(Codeplane.api_key).to eq("abc")
     end
   end
 
   describe ".endpoint" do
     it "returns real url" do
       ENV.delete("CODEPLANE_ENDPOINT")
-      Codeplane.endpoint.should == "https://codeplane.com/api/v1"
+      expect(Codeplane.endpoint).to eq("https://codeplane.com/api/v1")
     end
 
     it "returns alternative url" do
       ENV["CODEPLANE_ENDPOINT"] = "http://example.com"
-      Codeplane.endpoint.should == "http://example.com"
+      expect(Codeplane.endpoint).to eq("http://example.com")
     end
   end
 end

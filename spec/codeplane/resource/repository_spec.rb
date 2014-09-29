@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe Codeplane::Resource::Repository do
-  subject {
+  subject(:repository) {
     Codeplane::Resource::Repository.new(
       :id => 1234,
       :name => "some-project",
@@ -19,61 +19,61 @@ describe Codeplane::Resource::Repository do
   end
 
   describe "#resource_path" do
-    its(:resource_path) { should == "/repositories/some-project" }
+    it { expect(repository.resource_path).to eq("/repositories/some-project") }
   end
 
   describe "#mine?" do
     it "returns true" do
       Codeplane.username = "john"
-      subject = Codeplane::Resource::Repository.new(:user => {:username => "john"})
-      subject.should be_mine
+      repository = Codeplane::Resource::Repository.new(:user => {:username => "john"})
+      expect(repository).to be_mine
     end
 
     it "returns false" do
       Codeplane.username = "mary"
-      subject = Codeplane::Resource::Repository.new(:user => {:username => "john"})
-      subject.should_not be_mine
+      repository = Codeplane::Resource::Repository.new(:user => {:username => "john"})
+      expect(repository).not_to be_mine
     end
   end
 
   describe "#destroy" do
     it "raises error when trying to remove a repository that's not mine" do
       Codeplane.username = "mary"
-      subject = Codeplane::Resource::Repository.new(:user => {:username => "john"})
+      repository = Codeplane::Resource::Repository.new(:user => {:username => "john"})
 
       expect {
-        subject.destroy
+        repository.destroy
       }.to raise_error(Codeplane::OwnershipError)
     end
 
     it "removes my repository" do
       FakeWeb.register_uri :delete, "https://john:abc@codeplane.com/api/v1/repositories/some-repo", :status => 200
       default_credentials!
-      subject = Codeplane::Resource::Repository.new(:id => 1234, :name => "some-repo", :user => {:username => "john"}, :collection_resource_path => "/repositories")
-      subject.destroy
+      repository = Codeplane::Resource::Repository.new(:id => 1234, :name => "some-repo", :user => {:username => "john"}, :collection_resource_path => "/repositories")
+      repository.destroy
     end
   end
 
   describe "#attributes" do
-    it { should respond_to(:id) }
-    it { should respond_to(:name) }
-    it { should respond_to(:usage) }
-    it { should respond_to(:created_at) }
-    it { should respond_to(:user) }
-    it { should respond_to(:errors) }
-    it { should respond_to(:uri) }
+    it { expect(repository).to respond_to(:id) }
+    it { expect(repository).to respond_to(:name) }
+    it { expect(repository).to respond_to(:usage) }
+    it { expect(repository).to respond_to(:created_at) }
+    it { expect(repository).to respond_to(:user) }
+    it { expect(repository).to respond_to(:errors) }
+    it { expect(repository).to respond_to(:uri) }
 
     it {
       expect {
-        subject.attributes
+        repository.attributes
       }.to_not raise_error
     }
 
-    its(:attributes) {
-      should == {:repository => {:name => "some-project"}}
+    it {
+      expect(repository.attributes).to eql(:repository => {:name => "some-project"})
     }
 
-    its(:collection_resource_path) { should == "/repositories" }
-    its(:to_param) { should == "some-project" }
+    it { expect(repository.collection_resource_path).to eq("/repositories") }
+    it { expect(repository.to_param).to eq("some-project") }
   end
 end

@@ -1,28 +1,28 @@
 require "spec_helper"
 
 describe Codeplane::Resource::PublicKey do
-  subject { Codeplane::Resource::PublicKey.new(:id => 1234, :name => "macbook's", :key => "ssh-rsa key") }
+  subject(:public_key) { Codeplane::Resource::PublicKey.new(:id => 1234, :name => "macbook's", :key => "ssh-rsa key") }
 
   describe "#attributes" do
-    it { should respond_to(:id) }
-    it { should respond_to(:name) }
-    it { should respond_to(:key) }
-    it { should respond_to(:fingerprint) }
-    it { should respond_to(:errors) }
+    it { expect(public_key).to respond_to(:id) }
+    it { expect(public_key).to respond_to(:name) }
+    it { expect(public_key).to respond_to(:key) }
+    it { expect(public_key).to respond_to(:fingerprint) }
+    it { expect(public_key).to respond_to(:errors) }
 
     it {
-      expect {
-        subject.attributes
-      }.to_not raise_error
+      expect { public_key.attributes }.to_not raise_error
     }
 
-    its(:to_param) { should == 1234 }
+    it { expect(public_key.to_param).to eq(1234) }
 
-    its(:attributes) {
-      should == {:public_key => {
+    it {
+      payload = {:public_key => {
         :name => "macbook's",
         :key => "ssh-rsa key"
       }}
+
+      expect(public_key.attributes).to eq(payload)
     }
   end
 end

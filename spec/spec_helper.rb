@@ -1,11 +1,10 @@
-require "bundler"
-Bundler.setup(:default, :development)
-Bundler.require(:default, :development)
+require "bundler/setup"
 
 require "codeplane"
 require "test_notifier/runner/rspec"
 require "base64"
 require "addressable/uri"
+require 'fakeweb'
 
 FakeWeb.allow_net_connect = false
 

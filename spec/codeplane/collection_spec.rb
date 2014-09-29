@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe Codeplane::Collection do
-  subject {
+  subject(:collection) {
     Codeplane::Collection.new(
       :resource_path => "/things",
       :resource_class_name => "Thing"
@@ -9,19 +9,19 @@ describe Codeplane::Collection do
   }
 
   describe "#initialize" do
-    its(:resource_path) { should == "/things" }
-    its(:resource_class_name) { should == "Thing" }
+    it { expect(collection.resource_path).to eq("/things") }
+    it { expect(collection.resource_class_name).to eq("Thing") }
 
     it "includes extension" do
       mod = Module.new
-      Codeplane::Collection.new(:extension => mod).singleton_class.included_modules.should include(mod)
+      expect(Codeplane::Collection.new(:extension => mod).singleton_class.included_modules).to include(mod)
     end
   end
 
   describe "#resource_class" do
     it "retrieves specified class" do
-      subject.resource_class_name = "Thing"
-      subject.resource_class.should == Codeplane::Resource::Thing
+      collection.resource_class_name = "Thing"
+      expect(collection.resource_class).to eq(Codeplane::Resource::Thing)
     end
   end
 
@@ -32,65 +32,65 @@ describe Codeplane::Collection do
     end
 
     it "retrieves all items" do
-      subject.all.size.should == 3
+      expect(collection.all.size).to eq(3)
     end
 
     it "builds objects" do
-      subject.all[0].should be_a(Codeplane::Resource::Thing)
-      subject.all[1].should be_a(Codeplane::Resource::Thing)
-      subject.all[2].should be_a(Codeplane::Resource::Thing)
+      expect(collection.all[0]).to be_a(Codeplane::Resource::Thing)
+      expect(collection.all[1]).to be_a(Codeplane::Resource::Thing)
+      expect(collection.all[2]).to be_a(Codeplane::Resource::Thing)
     end
 
     it "sets attributes" do
-      thing = subject.all[0]
-      thing.name.should == "macbook"
-      thing.id.should == 1
-      thing.collection_resource_path.should == "/things"
+      thing = collection.all[0]
+      expect(thing.name).to eq("macbook")
+      expect(thing.id).to eq(1)
+      expect(thing.collection_resource_path).to eq("/things")
     end
   end
 
   describe "#each" do
     it "includes Enumerable" do
-      Codeplane::Collection.included_modules.should include(Enumerable)
+      expect(Codeplane::Collection.included_modules).to include(Enumerable)
     end
 
     it "returns an enumerator" do
       default_credentials!
       FakeWeb.register_uri :get, "https://john:abc@codeplane.com/api/v1/things", :body => "[]"
-      subject.each.should be_an(Enumerator)
+      expect(collection.each).to be_an(Enumerator)
     end
   end
 
   describe "#build" do
     it "returns a resource instance" do
-      subject.build.should be_a(Codeplane::Resource::Thing)
+      expect(collection.build).to be_a(Codeplane::Resource::Thing)
     end
 
     it "sets attributes" do
-      thing = subject.build(:name => "book")
-      thing.name.should == "book"
+      thing = collection.build(:name => "book")
+      expect(thing.name).to eq("book")
     end
   end
 
   describe "#create" do
     it "builds a new instance" do
-      subject.should_receive(:build).with(:name => "book").and_return(stub.as_null_object)
-      subject.create(:name => "book")
+      expect(collection).to receive(:build).with(:name => "book").and_return(double.as_null_object)
+      collection.create(:name => "book")
     end
 
     it "calls the #save method" do
-      thing = mock(Codeplane::Resource::Thing)
-      subject.stub :build => thing
+      thing = double(Codeplane::Resource::Thing)
+      collection.stub :build => thing
 
-      thing.should_receive(:save).once
-      subject.create
+      expect(thing).to receive(:save).once
+      collection.create
     end
   end
 
   describe "#count" do
-    before { subject.stub :all => [1,2,3] }
+    before { allow(collection).to receive(:all).and_return([1,2,3]) }
 
-    its(:count) { should == 3 }
-    its(:size) { should == 3 }
+    it { expect(collection.count).to eq(3) }
+    it { expect(collection.size).to eq(3) }
   end
 end

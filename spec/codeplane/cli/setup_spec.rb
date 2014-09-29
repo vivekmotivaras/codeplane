@@ -1,46 +1,48 @@
 require "spec_helper"
 
 describe Codeplane::CLI::Setup do
+  subject(:command) { described_class.new }
+
   before do
     Codeplane::CLI.stub :config_file => "/tmp/codeplane_config"
     FileUtils.rm(Codeplane::CLI.config_file) rescue nil
 
     Codeplane::CLI.stdout = ""
     Codeplane::CLI.stderr = ""
-    Codeplane::Request.stub :get
-    subject.stub :gets => ""
+    allow(Codeplane::Request).to receive :get
+    command.stub :gets => ""
   end
 
-  its(:skip_credentials?) { should be_true }
+  it { expect(command.skip_credentials?).to be_truthy }
 
   it "sets credentials" do
-    subject.should_receive(:gets).and_return("the_real_john\n", "some_api_key\n")
-    subject.base
+    expect(command).to receive(:gets).and_return("the_real_john\n", "some_api_key\n")
+    command.base
 
-    Codeplane.username.should == "the_real_john"
-    Codeplane.api_key.should == "some_api_key"
+    expect(Codeplane.username).to eq("the_real_john")
+    expect(Codeplane.api_key).to eq("some_api_key")
   end
 
   it "makes API call" do
-    Codeplane::Request.should_receive(:get).with("/auth")
-    subject.base
+    expect(Codeplane::Request).to receive(:get).with("/auth")
+    command.base
   end
 
   it "displays success message" do
     expect {
-      subject.base
+      command.base
     }.to_not raise_error
 
-    Codeplane::CLI.stdout.should include("Your credentials were saved at ~/.codeplane and chmoded as 0600.")
+    expect(Codeplane::CLI.stdout).to include("Your credentials were saved at ~/.codeplane and chmoded as 0600.")
   end
 
   it "saves credentials to filesystem" do
-    subject.should_receive(:gets).and_return("the_real_john\n", "some_api_key\n")
-    subject.base
+    expect(command).to receive(:gets).and_return("the_real_john\n", "some_api_key\n")
+    command.base
 
-    File.should be_file(Codeplane::CLI.config_file)
-    YAML.load_file(Codeplane::CLI.config_file).should == {:username => "the_real_john", :api_key => "some_api_key"}
-    File.should_not be_world_writable(Codeplane::CLI.config_file)
-    File.should_not be_world_readable(Codeplane::CLI.config_file)
+    expect(File).to be_file(Codeplane::CLI.config_file)
+    expect(YAML.load_file(Codeplane::CLI.config_file)).to eq({:username => "the_real_john", :api_key => "some_api_key"})
+    expect(File).not_to be_world_writable(Codeplane::CLI.config_file)
+    expect(File).not_to be_world_readable(Codeplane::CLI.config_file)
   end
 end

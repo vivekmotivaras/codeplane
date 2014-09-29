@@ -3,37 +3,37 @@ require "spec_helper"
 describe Codeplane::Request do
   context "request shortcuts" do
     it "implements GET" do
-      subject.should respond_to(:get)
+      expect(subject).to respond_to(:get)
     end
 
     it "implements POST" do
-      subject.should respond_to(:post)
+      expect(subject).to respond_to(:post)
     end
 
     it "implements PUT" do
-      subject.should respond_to(:put)
+      expect(subject).to respond_to(:put)
     end
 
     it "implements DELETE" do
-      subject.should respond_to(:delete)
+      expect(subject).to respond_to(:delete)
     end
   end
 
   describe "#net_class" do
     it "detects GET" do
-      subject.net_class(:Get).should == Net::HTTP::Get
+      expect(subject.net_class(:Get)).to eq(Net::HTTP::Get)
     end
 
     it "detects POST" do
-      subject.net_class(:Post).should == Net::HTTP::Post
+      expect(subject.net_class(:Post)).to eq(Net::HTTP::Post)
     end
 
     it "detects PUT" do
-      subject.net_class(:Put).should == Net::HTTP::Put
+      expect(subject.net_class(:Put)).to eq(Net::HTTP::Put)
     end
 
     it "detects DELETE" do
-      subject.net_class(:Delete).should == Net::HTTP::Delete
+      expect(subject.net_class(:Delete)).to eq(Net::HTTP::Delete)
     end
   end
 
@@ -50,17 +50,17 @@ describe Codeplane::Request do
 
     it "sets user agent" do
       subject.get("/")
-      FakeWeb.last_request["User-Agent"].should == "Codeplane/#{Codeplane::Version::STRING}"
+      expect(FakeWeb.last_request["User-Agent"]).to eq("Codeplane/#{Codeplane::Version::STRING}")
     end
 
     it "sets content type" do
       subject.get("/")
-      FakeWeb.last_request["Content-Type"].should == "application/x-www-form-urlencoded"
+      expect(FakeWeb.last_request["Content-Type"]).to eq("application/x-www-form-urlencoded")
     end
 
     it "sets body" do
       subject.post("/", :repository => {:name => "myrepo"})
-      request_body.should == {"repository" => {"name" => "myrepo"}}
+      expect(request_body).to eq({"repository" => {"name" => "myrepo"}})
     end
 
     it "sets credentials" do
@@ -71,11 +71,11 @@ describe Codeplane::Request do
 
       FakeWeb.register_uri :any, "https://john:abc@example.com", :status => 200
       subject.get("/")
-      FakeWeb.last_request["authorization"].should == "Basic " + Base64.encode64("john:abc").chomp
+      expect(FakeWeb.last_request["authorization"]).to eq("Basic " + Base64.encode64("john:abc").chomp)
     end
 
     it "returns a response object" do
-      subject.get("/").should be_a(Codeplane::Response)
+      expect(subject.get("/")).to be_a(Codeplane::Response)
     end
 
     it "detects 401 status" do

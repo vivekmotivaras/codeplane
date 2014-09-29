@@ -5,7 +5,7 @@ describe Codeplane::CLI::User do
     Codeplane::CLI.stdout = ""
     Codeplane::CLI.stderr = ""
     subject.client.repositories.stub :all => [
-      stub(:name => "repo", :mine? => true, :collaborators => stub(:all => []))
+      double(:name => "repo", :mine? => true, :collaborators => double(:all => []))
     ]
 
     subject.args = ["repo"]
@@ -14,67 +14,67 @@ describe Codeplane::CLI::User do
   describe "#list" do
     it "lists collaborators" do
       subject.client.repositories.first.collaborators.stub :all => [
-        stub(:name => "John Doe", :email => "john@doe.com"),
-        stub(:name => "Tim Doe", :email => "tim@doe.com")
+        double(:name => "John Doe", :email => "john@doe.com"),
+        double(:name => "Tim Doe", :email => "tim@doe.com")
       ]
 
       subject.list
 
-      clean(Codeplane::CLI.stdout).should include("John Doe    # john@doe.com")
-      clean(Codeplane::CLI.stdout).should include("Tim Doe     # tim@doe.com")
+      expect(clean(Codeplane::CLI.stdout)).to include("John Doe    # john@doe.com")
+      expect(clean(Codeplane::CLI.stdout)).to include("Tim Doe     # tim@doe.com")
     end
 
     it "exits when have no collaborators" do
-      subject.should_receive(:exit).with(1).and_raise(SystemExit)
+      expect(subject).to receive(:exit).with(1).and_raise(SystemExit)
       expect { subject.list }.to raise_error(SystemExit)
 
-      Codeplane::CLI.stderr.should include("No collaborators were added to 'repo'")
+      expect(Codeplane::CLI.stderr).to include("No collaborators were added to 'repo'")
     end
 
     it "exits when trying to list shared repository's collaborators" do
       subject.client.repositories.first.collaborators.stub :all => [
-        stub(:name => "John Doe", :email => "john@doe.com")
+        double(:name => "John Doe", :email => "john@doe.com")
       ]
       subject.client.repositories.first.stub :mine? => false
-      subject.should_receive(:exit).with(1).and_raise(SystemExit)
+      expect(subject).to receive(:exit).with(1).and_raise(SystemExit)
       expect { subject.list }.to raise_error(SystemExit)
 
-      Codeplane::CLI.stderr.should include("Couldn't find 'repo' repository")
+      expect(Codeplane::CLI.stderr).to include("Couldn't find 'repo' repository")
     end
 
     it "exits when repository is not found" do
       subject.args = ["another-repo"]
-      subject.should_receive(:exit).with(1).and_raise(SystemExit)
+      expect(subject).to receive(:exit).with(1).and_raise(SystemExit)
       expect { subject.list }.to raise_error(SystemExit)
 
-      Codeplane::CLI.stderr.should include("Couldn't find 'another-repo' repository")
+      expect(Codeplane::CLI.stderr).to include("Couldn't find 'another-repo' repository")
     end
 
     it "exits when no repository name is provided" do
       subject.args = []
-      subject.should_receive(:exit).with(1).and_raise(SystemExit)
+      expect(subject).to receive(:exit).with(1).and_raise(SystemExit)
       expect { subject.list }.to raise_error(SystemExit)
 
-      Codeplane::CLI.stderr.should include("Provide the repository name")
+      expect(Codeplane::CLI.stderr).to include("Provide the repository name")
     end
   end
 
   describe "#add" do
     it "displays message" do
       subject.args = ["repo", "john@doe.com"]
-      subject.client.repositories.all.first.collaborators.should_receive(:invite).with("john@doe.com").and_return(stub(:valid? => true, :email => "john@doe.com"))
+      expect(subject.client.repositories.all.first.collaborators).to receive(:invite).with("john@doe.com").and_return(double(:valid? => true, :email => "john@doe.com"))
 
       expect { subject.add }.to raise_error(SystemExit)
-      Codeplane::CLI.stdout.should include("We sent an invitation to john@doe.com")
+      expect(Codeplane::CLI.stdout).to include("We sent an invitation to john@doe.com")
     end
 
     it "displays errors" do
       subject.args = ["repo", "john@doe.com"]
-      subject.client.repositories.all.first.collaborators.should_receive(:invite).with("john@doe.com").and_return(stub(:valid? => false, :errors => ["Something is wrong"]))
-      subject.should_receive(:exit).with(1).and_raise(SystemExit)
+      expect(subject.client.repositories.all.first.collaborators).to receive(:invite).with("john@doe.com").and_return(double(:valid? => false, :errors => ["Something is wrong"]))
+      expect(subject).to receive(:exit).with(1).and_raise(SystemExit)
 
       expect { subject.add }.to raise_error(SystemExit)
-      Codeplane::CLI.stderr.should include("* Something is wrong")
+      expect(Codeplane::CLI.stderr).to include("* Something is wrong")
     end
   end
 
@@ -83,19 +83,19 @@ describe Codeplane::CLI::User do
 
     it "displays message" do
       subject.args = ["repo", "john@doe.com"]
-      repo.collaborators.should_receive(:remove).with("john@doe.com").and_return(stub(:success? => true))
+      expect(repo.collaborators).to receive(:remove).with("john@doe.com").and_return(double(:success? => true))
 
       expect { subject.remove }.to raise_error(SystemExit)
-      Codeplane::CLI.stdout.should include("We revoked john@doe.com permissions on 'repo'")
+      expect(Codeplane::CLI.stdout).to include("We revoked john@doe.com permissions on 'repo'")
     end
 
     it "display errors" do
       subject.args = ["repo", "john@doe.com"]
-      repo.collaborators.should_receive(:remove).with("john@doe.com").and_raise(Codeplane::NotFoundError)
-      subject.should_receive(:exit).with(1).and_raise(SystemExit)
+      expect(repo.collaborators).to receive(:remove).with("john@doe.com").and_raise(Codeplane::NotFoundError)
+      expect(subject).to receive(:exit).with(1).and_raise(SystemExit)
 
       expect { subject.remove }.to raise_error(SystemExit)
-      Codeplane::CLI.stderr.should include("We couldn't find this collaborator")
+      expect(Codeplane::CLI.stderr).to include("We couldn't find this collaborator")
     end
   end
 end

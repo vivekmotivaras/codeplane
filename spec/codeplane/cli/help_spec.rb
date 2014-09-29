@@ -1,46 +1,48 @@
 require "spec_helper"
 
 describe Codeplane::CLI::Help do
+  subject(:command) { described_class.new }
+
   before do
     Codeplane::CLI.stdout = StringIO.new
     Codeplane::CLI.stderr = StringIO.new
   end
-  
-  its(:skip_credentials?) { should be_true }
+
+  it { expect(command.skip_credentials?).to be_truthy }
 
   it "displays help for all known commands" do
-    Codeplane::CLI::Help.should_receive(:help).ordered.once
-    Codeplane::CLI::Setup.should_receive(:help).ordered.once
-    Codeplane::CLI::Auth.should_receive(:help).ordered.once
-    Codeplane::CLI::Repo.should_receive(:help).ordered.once
-    Codeplane::CLI::User.should_receive(:help).ordered.once
+    expect(Codeplane::CLI::Help).to receive(:help).ordered.once
+    expect(Codeplane::CLI::Setup).to receive(:help).ordered.once
+    expect(Codeplane::CLI::Auth).to receive(:help).ordered.once
+    expect(Codeplane::CLI::Repo).to receive(:help).ordered.once
+    expect(Codeplane::CLI::User).to receive(:help).ordered.once
 
-    subject.base
+    command.base
   end
 
   it "displays help specified command" do
-    Codeplane::CLI::Setup.should_receive(:help).once
-    Codeplane::CLI::Help.should_not_receive(:help)
-    Codeplane::CLI::Auth.should_not_receive(:help)
-    Codeplane::CLI::Repo.should_not_receive(:help)
-    Codeplane::CLI::User.should_not_receive(:help)
+    expect(Codeplane::CLI::Setup).to receive(:help).once
+    expect(Codeplane::CLI::Help).not_to receive(:help)
+    expect(Codeplane::CLI::Auth).not_to receive(:help)
+    expect(Codeplane::CLI::Repo).not_to receive(:help)
+    expect(Codeplane::CLI::User).not_to receive(:help)
 
-    subject = Codeplane::CLI::Help.new(%w[setup])
-    subject.base
+    command = Codeplane::CLI::Help.new(%w[setup])
+    command.base
   end
 
   it "display help's help for invalid commands" do
-    Codeplane::CLI::Help.should_receive(:help).once
-    Codeplane::CLI::Setup.should_not_receive(:help)
-    Codeplane::CLI::Auth.should_not_receive(:help)
-    Codeplane::CLI::Repo.should_not_receive(:help)
-    Codeplane::CLI::User.should_not_receive(:help)
+    expect(Codeplane::CLI::Help).to receive(:help).once
+    expect(Codeplane::CLI::Setup).not_to receive(:help)
+    expect(Codeplane::CLI::Auth).not_to receive(:help)
+    expect(Codeplane::CLI::Repo).not_to receive(:help)
+    expect(Codeplane::CLI::User).not_to receive(:help)
 
-    subject = Codeplane::CLI::Help.new(%w[invalid])
-    subject.should_receive(:exit).with(1).and_raise(SystemExit)
+    command = Codeplane::CLI::Help.new(%w[invalid])
+    expect(command).to receive(:exit).with(1).and_raise(SystemExit)
 
     expect {
-      subject.base
+      command.base
     }.to raise_error(SystemExit)
   end
 end
