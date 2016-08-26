@@ -23,7 +23,7 @@ module Codeplane
     end
 
     def payload
-      JSON.load raw.body
+      JSON.parse raw.body
     end
   end
 end
